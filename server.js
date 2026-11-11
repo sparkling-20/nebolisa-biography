@@ -3,7 +3,7 @@ require("dotenv").config();
 
 const express = require("express");
 const mongoose = require("mongoose");
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
 const path = require("path");
 
 const app = express();
@@ -24,20 +24,9 @@ const adminAuth = (req, res, next) => {
 
 const PORT = process.env.PORT || 3000;
 
-const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    },
-    connectionTimeout: 20000,
-    greetingTimeout: 20000,
-    socketTimeout: 30000
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-app.locals.transporter = transporter;
+app.locals.resend = resend;
 
 // Middleware
 app.use(express.json());

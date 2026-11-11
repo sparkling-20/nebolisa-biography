@@ -39,11 +39,11 @@ router.post("/", async (req, res) => {
             message
         });
 
-        // Send email notification
+        // Send email notification using Resend
 try {
-    await req.app.locals.transporter.sendMail({
-        from: process.env.EMAIL_USER,
-        to: process.env.EMAIL_USER,
+    const result = await req.app.locals.resend.emails.send({
+        from: "Portfolio <onboarding@resend.dev>",
+        to: [process.env.EMAIL_USER],
         replyTo: email,
         subject: `New Portfolio Message: ${subject}`,
         text: `
@@ -56,7 +56,11 @@ ${message}
         `
     });
 
-    console.log("Email notification sent successfully!");
+    if (result.error) {
+        console.error("Email notification failed:", result.error);
+    } else {
+        console.log("Email notification sent successfully!");
+    }
 
 } catch (emailError) {
     console.error("Email notification failed:", emailError.message);
