@@ -25,11 +25,16 @@ const adminAuth = (req, res, next) => {
 const PORT = process.env.PORT || 3000;
 
 const transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
-    }
+    },
+    connectionTimeout: 20000,
+    greetingTimeout: 20000,
+    socketTimeout: 30000
 });
 
 app.locals.transporter = transporter;
