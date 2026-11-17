@@ -4,6 +4,10 @@ const router = express.Router();
 
 const Message = require("../models/Message");
 
+const contactSchema = require("../schemas/contactSchema");
+const validateRequest = require("../middleware/validateRequest");
+const contactLimiter = require("../middleware/rateLimiter");
+
 // Admin authentication
 const adminAuth = (req, res, next) => {
     const apiKey = req.headers["x-admin-key"];
@@ -19,7 +23,8 @@ const adminAuth = (req, res, next) => {
 };
 
 // CREATE: Save a new contact message
-router.post("/", async (req, res) => {
+router.post("/",   contactLimiter,
+  validateRequest(contactSchema),  async (req, res) => {
     try {
         const { name, email, subject, message } = req.body;
 

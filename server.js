@@ -6,27 +6,17 @@ const mongoose = require("mongoose");
 const { Resend } = require("resend");
 const path = require("path");
 
+const helmet = require("helmet");
+
 const app = express();
-
-// Protect admin routes
-const adminAuth = (req, res, next) => {
-    const apiKey = req.headers["x-admin-key"];
-
-    if (apiKey !== process.env.ADMIN_API_KEY) {
-        return res.status(401).json({
-            success: false,
-            message: "Unauthorized access."
-        });
-    }
-
-    next();
-};
 
 const PORT = process.env.PORT || 3000;
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 app.locals.resend = resend;
+
+app.use(helmet({ contentSecurityPolicy: false }));
 
 // Middleware
 app.use(express.json());
@@ -45,6 +35,11 @@ app.get("/api/health", (req, res) => {
         message: "Portfolio backend is running!"
     });
 });
+
+// Centralised error handler
+const errorHandler = require("./middleware/errorHandler");
+app.use(errorHandler);
+
 
 // Connect to MongoDB and start server
 mongoose.connect(process.env.MONGODB_URI)
